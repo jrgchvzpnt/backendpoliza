@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.coppel.proyecto.poliza.Repository.EmpleadoRepository;
 import com.coppel.proyecto.poliza.models.Empleado;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,8 @@ import java.util.Optional;
 @RequestMapping("/api/empleados")
 
 public class EmpleadoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmpleadoController.class);
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
@@ -49,7 +53,9 @@ public class EmpleadoController {
 
     @PostMapping
     public ResponseEntity<?> createEmpleado(@RequestBody Empleado empleado) {
+        logger.info("Iniciando creación de Empleado con ID: {}", empleado.getIdEmpleado());
         if (empleadoRepository.existsById(empleado.getIdEmpleado())) {
+            logger.warn("el ID del empleado ya existe {}", empleado.getIdEmpleado());
             return ResponseEntity.status(400).body(Map.of("Meta", Map.of("Status", "FAILURE"), "Data",
                     Map.of("Mensaje", "ID de empleado ya existe.")));
         }
