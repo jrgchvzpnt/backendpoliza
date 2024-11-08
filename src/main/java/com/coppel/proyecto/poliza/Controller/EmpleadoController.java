@@ -3,6 +3,7 @@ package com.coppel.proyecto.poliza.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.coppel.proyecto.poliza.Repository.EmpleadoRepository;
 import com.coppel.proyecto.poliza.models.Empleado;
@@ -81,14 +82,22 @@ public class EmpleadoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmpleado(@PathVariable Long id) {
-        if (empleadoRepository.existsById(id)) {
-            empleadoRepository.deleteById(id);
-            return ResponseEntity.ok(Map.of(
-                    "Meta", Map.of("Status", "OK"),
-                    "Data", Map.of("Mensaje", "Empleado eliminado correctamente.")));
-        } else {
-            return ResponseEntity.status(404).body(
-                    Map.of("Meta", Map.of("Status", "FAILURE"), "Data", Map.of("Mensaje", "Empleado no encontrado.")));
+        try {
+            if (empleadoRepository.existsById(id)) {
+                empleadoRepository.deleteById(id);
+                return ResponseEntity.ok(Map.of(
+                        "Meta", Map.of("Status", "OK"),
+                        "Data", Map.of("Mensaje", "Empleado eliminado correctamente.")));
+            } else {
+                return ResponseEntity.status(404).body(
+                        Map.of("Meta", Map.of("Status", "FAILURE"),
+                                "Data", Map.of("Mensaje", "Empleado no encontrado.")));
+            }
+        } catch (DataIntegrityViolationException ex) {
+            return ResponseEntity.status(400).body(
+                    Map.of("Meta", Map.of("Status", "FAILURE"),
+                            "Data", Map.of("Mensaje",
+                                    "No se puede eliminar un empleado asociado a una póliza. Favor de eliminar la póliza primero.")));
         }
     }
 
