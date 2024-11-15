@@ -10,7 +10,9 @@ import com.coppel.proyecto.poliza.Repository.InventarioRepository;
 import com.coppel.proyecto.poliza.Repository.PolizaRepository;
 import com.coppel.proyecto.poliza.models.Inventario;
 import com.coppel.proyecto.poliza.models.Poliza;
+import com.coppel.proyecto.poliza.models.PolizaDTO;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -211,5 +213,43 @@ public class PolizaController {
                                         Map.of("Mensaje", "Ha ocurrido un error al intentar eliminar la póliza.")));
                 }
 
+        }
+
+        @GetMapping("/search/dates")
+        public ResponseEntity<List<PolizaDTO>> searchByDates(
+                        @RequestParam(value = "date1", defaultValue = "2024-04-11") String date1,
+                        @RequestParam(value = "date2", defaultValue = "2024-04-11") String date2) {
+                List<Poliza> consults = polizaRepository.searchByDates(date1, date2);
+                // Convertir manualmente cada Poliza a PolizaDTO
+                List<PolizaDTO> consultsDTOs = new ArrayList<>();
+                for (Poliza poliza : consults) {
+                        PolizaDTO dto = new PolizaDTO();
+                        dto.setIdPoliza(poliza.getIdPoliza());
+                        dto.setCantidad(poliza.getCantidad());
+                        dto.setEmpleado(poliza.getEmpleadoGenero()); // Mapear atributos específicos si es necesario
+                        dto.setInventario(poliza.getInventario()); // Mapear atributos específicos si es necesario
+                        dto.setFecha(poliza.getFecha());
+
+                        consultsDTOs.add(dto);
+                }
+                return ResponseEntity.ok(consultsDTOs);
+        }
+
+        @PostMapping("/search/others")
+        public ResponseEntity<List<PolizaDTO>> searchByOthers(@RequestBody PolizaDTO filterDTO) {
+                List<Poliza> consults = polizaRepository.search(filterDTO.getEmpleado().getIdEmpleado(),
+                                filterDTO.getEmpleado().getNombre());
+                List<PolizaDTO> consultsDTOs = new ArrayList<>();
+                for (Poliza poliza : consults) {
+                        PolizaDTO dto = new PolizaDTO();
+                        dto.setIdPoliza(poliza.getIdPoliza());
+                        dto.setCantidad(poliza.getCantidad());
+                        dto.setEmpleado(poliza.getEmpleadoGenero()); // Mapear atributos específicos si es necesario
+                        dto.setInventario(poliza.getInventario()); // Mapear atributos específicos si es necesario
+                        dto.setFecha(poliza.getFecha());
+
+                        consultsDTOs.add(dto);
+                }
+                return ResponseEntity.ok(consultsDTOs);
         }
 }

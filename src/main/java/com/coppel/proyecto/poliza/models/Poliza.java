@@ -1,8 +1,5 @@
 package com.coppel.proyecto.poliza.models;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
 import java.util.Date;
 
 import jakarta.persistence.*;
@@ -21,13 +18,16 @@ public class Poliza {
     private Long idPoliza;
 
     @ManyToOne
-    @JoinColumn(name = "empleado_id")
+    @JoinColumn(name = "empleado_id", nullable = false)
     private Empleado empleadoGenero;
 
     @ManyToOne
-    @JoinColumn(name = "sku")
+    @JoinColumn(name = "sku", nullable = false)
     private Inventario inventario;
 
+    @Column(length = 2, nullable = false)
     private Integer cantidad;
-    private Date fecha;
+
+    @Column(nullable = false)
+    private String fecha;
 }
